@@ -19,11 +19,6 @@ public class QuoteController {
 
     private final QuoteService quoteService;
 
-    /** GET /api/v1/quotes */
-    @GetMapping
-    public ResponseEntity<List<QuoteListItemResponse>> getAll() {
-        return ResponseEntity.ok(quoteService.getAllQuotes());
-    }
 
     /** POST /api/v1/quotes */
     @PostMapping
