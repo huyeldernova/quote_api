@@ -1,0 +1,95 @@
+services:
+
+  # ── MySQL ────────────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: quotesend-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE:      ${DB_NAME}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - quotesend-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ── Redis (không password) ───────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: quotesend-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - quotesend-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Spring Boot App ──────────────────────────────────────────────────────
+  app:
+    image: huybui2871997/quotesend-api:latest
+    container_name: quotesend-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      # Database
+      SPRING_DATASOURCE_URL:               jdbc:mysql://mysql:3306/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
+      SPRING_DATASOURCE_USERNAME:          ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD:          ${DB_PASSWORD}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+
+      # JPA
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL:           false
+
+      # Redis
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+
+      # JWT
+      JWT_SECRET_KEY:               ${JWT_SECRET_KEY}
+      JWT_ACCESS_TOKEN_EXPIRATION:  ${JWT_ACCESS_TOKEN_EXPIRATION}
+      JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION}
+
+      # Email
+      SPRING_MAIL_HOST:                              smtp.gmail.com
+      SPRING_MAIL_PORT:                              587
+      SPRING_MAIL_USERNAME:                          ${MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD:                          ${MAIL_PASSWORD}
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH:         true
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
+
+      # AWS S3
+      AWS_S3_REGION:      ${AWS_REGION}
+      AWS_S3_ACCESS_KEY:  ${AWS_ACCESS_KEY}
+      AWS_S3_SECRET_KEY:  ${AWS_SECRET_KEY}
+      AWS_S3_BUCKET_NAME: ${AWS_BUCKET_NAME}
+
+      # App
+      APP_BASE_URL: ${APP_BASE_URL}
+
+    ports:
+      - "8081:8080"
+    networks:
+      - quotesend-net
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  quotesend-net:
+    driver: bridge

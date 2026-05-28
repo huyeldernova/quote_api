@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/>
+<style>
+  body { font-family: Arial, sans-serif; background: #F3F4F6; margin: 0; padding: 20px; }
+  .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; }
+  .header { background: #0F2050; color: white; padding: 24px 32px; }
+  .header h1 { margin: 0; font-size: 20px; letter-spacing: 2px; }
+  .gold-bar { height: 3px; background: linear-gradient(90deg,#C9A84C,#F0D080,#C9A84C); }
+  .body { padding: 28px 32px; color: #374151; line-height: 1.7; }
+  .quote-card { background: #EEF3FB; border-left: 4px solid #1E3A6E; border-radius: 4px; padding: 16px; margin: 20px 0; }
+  .quote-card table { width: 100%; font-size: 13px; }
+  .quote-card td { padding: 3px 0; }
+  .label { color: #6B7280; width: 140px; }
+  .cta { display: inline-block; background: #1E3A6E; color: white; padding: 12px 28px;
+         border-radius: 6px; text-decoration: none; font-weight: bold; margin: 16px 0; }
+  .footer { background: #0F2050; color: rgba(255,255,255,0.6); padding: 16px 32px; font-size: 11px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>TOURIST LEADER</h1>
+    <div style="color:#C9A84C;font-size:10px;letter-spacing:3px;margin-top:4px;">EXPLORE THE WORLD</div>
+  </div>
+  <div class="gold-bar"></div>
+  <div class="body">
+    <p th:text="${message}"></p>
+    <div class="quote-card">
+      <strong style="color:#1E3A6E;font-size:14px;" th:text="${tourName}"></strong>
+      <table style="margin-top:10px;">
+        <tr><td class="label">Departure:</td><td th:text="${startDate}"></td></tr>
+        <tr><td class="label">Passengers:</td><td th:text="${paxCount} + ' persons'"></td></tr>
+        <tr><td class="label">Price / person:</td><td th:text="'₹ ' + ${pricePerPerson}"></td></tr>
+        <tr><td class="label">Total:</td><td><strong th:text="'₹ ' + ${totalAmount}"></strong></td></tr>
+      </table>
+    </div>
+    <p>Please find the detailed quote PDF attached to this email.</p>
+    <p style="margin-top:24px;">Best regards,<br/><strong>Tourist Leader Team</strong></p>
+    <!-- tracking pixel -->
+    <img th:src="${trackingUrl}" width="1" height="1" style="display:block;" alt=""/>
+  </div>
+  <div class="gold-bar"></div>
+  <div class="footer">
+    <div>help@touristleader.com | +91 080 6218-2211 | www.touristleader.com</div>
+    <div style="margin-top:4px;">112/5 Dr Ambedkar Road, Whitefield, Bangalore 560066</div>
+  </div>
+</div>
+</body></html>
