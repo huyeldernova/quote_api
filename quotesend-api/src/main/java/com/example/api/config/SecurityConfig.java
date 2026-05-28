@@ -91,7 +91,9 @@ public class SecurityConfig {
         cfg.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
                 "http://localhost:5173",
-                "https://thedigitaldyno.in"
+                "https://thedigitaldyno.in",
+                "https://www.thedigitaldyno.in",
+                "https://fe-quote.vercel.app"
         ));
         cfg.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         cfg.setAllowedHeaders(List.of("*"));
