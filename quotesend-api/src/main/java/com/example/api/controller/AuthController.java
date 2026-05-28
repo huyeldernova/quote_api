@@ -54,4 +54,28 @@ public class AuthController {
         }
         return ResponseEntity.ok().build();
     }
+
+    /** PUT /api/v1/auth/change-password */
+    @PutMapping("/change-password")
+    public ResponseEntity<Void> changePassword(
+            @Valid @RequestBody ChangePasswordRequest req) {
+        authService.changePassword(req);
+        return ResponseEntity.ok().build();
+    }
+
+    /** POST /api/v1/auth/forgot-password */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest req) {
+        authService.forgotPassword(req);
+        return ResponseEntity.ok().build();
+    }
+
+    /** POST /api/v1/auth/reset-password */
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest req) {
+        authService.resetPassword(req);
+        return ResponseEntity.ok().build();
+    }
 }

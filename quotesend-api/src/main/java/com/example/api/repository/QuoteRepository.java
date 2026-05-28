@@ -2,6 +2,8 @@ package com.example.api.repository;
 
 import com.example.api.entity.Quote;
 import com.example.api.enums.QuoteStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -51,4 +53,19 @@ public interface QuoteRepository extends JpaRepository<Quote, Long> {
     List<Quote> searchQuotes(@Param("userId") String userId,
                              @Param("status") QuoteStatus status,
                              @Param("keyword") String keyword);
+
+
+    Page<Quote> findByUserIdOrderByCreatedAtDesc(String userId, Pageable pageable);
+
+    @Query("SELECT q FROM Quote q WHERE q.user.id = :userId " +
+            "AND (:status IS NULL OR q.status = :status) " +
+            "AND (:keyword IS NULL OR LOWER(q.clientName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(q.tourName) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "ORDER BY q.createdAt DESC")
+    Page<Quote> searchQuotes(@Param("userId") String userId,
+                             @Param("status") QuoteStatus status,
+                             @Param("keyword") String keyword,
+                             Pageable pageable);
+
+
 }

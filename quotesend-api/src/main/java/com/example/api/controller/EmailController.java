@@ -2,6 +2,7 @@ package com.example.api.controller;
 
 import com.example.api.dto.response.EmailLogResponse;
 import com.example.api.dto.response.EmailStatsResponse;
+import com.example.api.dto.response.PageResponse;
 import com.example.api.service.EmailLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +17,12 @@ public class EmailController {
 
     private final EmailLogService emailLogService;
 
-    /** GET /api/v1/emails */
+    /** GET /api/v1/emails?page=0&size=10 */
     @GetMapping
-    public ResponseEntity<List<EmailLogResponse>> getAll() {
-        return ResponseEntity.ok(emailLogService.getAllLogs());
+    public ResponseEntity<PageResponse<EmailLogResponse>> getAll(
+            @RequestParam(defaultValue = "0")  int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(emailLogService.getAllLogs(page, size));
     }
 
     /** GET /api/v1/emails/stats */

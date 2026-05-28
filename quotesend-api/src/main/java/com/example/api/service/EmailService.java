@@ -24,28 +24,24 @@ public class EmailService {
     private final TemplateEngine templateEngine;
     private final PdfService     pdfService;
 
-    @Value("${app.base-url}")     private String baseUrl;
+    @Value("${app.base-url}")         private String baseUrl;
     @Value("${spring.mail.username}") private String fromEmail;
 
     public void sendQuoteEmail(Quote quote, EmailLog emailLog, String message) {
         try {
-            // 1 – Generate PDF bytes
             byte[] pdfBytes = pdfService.generateQuotePdf(quote);
 
-            // 2 – Build HTML body via Thymeleaf
             DecimalFormat fmt = new DecimalFormat("#,##0");
             Context ctx = new Context();
-            ctx.setVariable("tourName",     quote.getTourName());
-            ctx.setVariable("startDate",    quote.getStartDate());
-            ctx.setVariable("paxCount",     quote.getPaxCount());
+            ctx.setVariable("tourName",       quote.getTourName());
+            ctx.setVariable("startDate",      quote.getStartDate());
+            ctx.setVariable("paxCount",       quote.getPaxCount());
             ctx.setVariable("pricePerPerson", fmt.format(quote.getPricePerPerson() != null ? quote.getPricePerPerson() : 0));
-            ctx.setVariable("totalAmount",  fmt.format(quote.getTotalAmount() != null ? quote.getTotalAmount() : 0));
-            ctx.setVariable("message",      message);
-            ctx.setVariable("trackingUrl",
-                    baseUrl + "/track/open/" + emailLog.getTrackingToken());
+            ctx.setVariable("totalAmount",    fmt.format(quote.getTotalAmount()    != null ? quote.getTotalAmount()    : 0));
+            ctx.setVariable("message",        message);
+            ctx.setVariable("trackingUrl",    baseUrl + "/track/open/" + emailLog.getTrackingToken());
             String htmlBody = templateEngine.process("email-quote", ctx);
 
-            // 3 – Build MimeMessage
             MimeMessage mime = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mime, true, "UTF-8");
             helper.setFrom(fromEmail, "Tourist Leader");
@@ -56,10 +52,11 @@ public class EmailService {
             helper.setSubject(emailLog.getSubject());
             helper.setText(htmlBody, true);
 
-            // 4 – Attach PDF
             String filename = "Quote_%s_%s.pdf".formatted(
-                    quote.getQuoteNumber(), quote.getClientName().replaceAll("\\s+", "_"));
-            helper.addAttachment(filename, () -> new java.io.ByteArrayInputStream(pdfBytes),
+                    quote.getQuoteNumber(),
+                    quote.getClientName().replaceAll("\\s+", "_"));
+            helper.addAttachment(filename,
+                    () -> new java.io.ByteArrayInputStream(pdfBytes),
                     "application/pdf");
 
             mailSender.send(mime);

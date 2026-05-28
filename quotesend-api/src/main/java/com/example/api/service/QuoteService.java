@@ -15,6 +15,9 @@ import com.example.api.repository.UserRepository;
 import com.example.api.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -218,11 +221,6 @@ public class QuoteService {
         return quoteNumber;
     }
 
-    public List<QuoteListItemResponse> searchQuotes(String keyword, QuoteStatus status) {
-        String userId = securityUtils.getCurrentUserId();
-        return quoteRepository.searchQuotes(userId, status, keyword)
-                .stream().map(this::toListItem).toList();
-    }
 
 
     public QuoteListItemResponse toListItem(Quote q) {
@@ -234,6 +232,34 @@ public class QuoteService {
                 .status(q.getStatus())
                 .createdAt(q.getCreatedAt() != null
                         ? q.getCreatedAt().format(DateTimeFormatter.ofPattern("dd MMM yyyy")) : null)
+                .build();
+    }
+
+    public PageResponse<QuoteListItemResponse> getAllQuotes(int page, int size) {
+        String userId = securityUtils.getCurrentUserId();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Quote> result = quoteRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+        return PageResponse.<QuoteListItemResponse>builder()
+                .content(result.getContent().stream().map(this::toListItem).toList())
+                .page(result.getNumber())
+                .size(result.getSize())
+                .totalElements(result.getTotalElements())
+                .totalPages(result.getTotalPages())
+                .last(result.isLast())
+                .build();
+    }
+
+    public PageResponse<QuoteListItemResponse> searchQuotes(String keyword, QuoteStatus status, int page, int size) {
+        String userId = securityUtils.getCurrentUserId();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Quote> result = quoteRepository.searchQuotes(userId, status, keyword, pageable);
+        return PageResponse.<QuoteListItemResponse>builder()
+                .content(result.getContent().stream().map(this::toListItem).toList())
+                .page(result.getNumber())
+                .size(result.getSize())
+                .totalElements(result.getTotalElements())
+                .totalPages(result.getTotalPages())
+                .last(result.isLast())
                 .build();
     }
 

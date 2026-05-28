@@ -19,7 +19,13 @@ public enum ErrorCode {
     FILE_TOO_LARGE       (400, "File exceeds maximum allowed size",HttpStatus.BAD_REQUEST),
     INVALID_FILE_TYPE    (400, "Only image files are allowed",    HttpStatus.BAD_REQUEST),
     FILE_UPLOAD_FAILED   (500, "Failed to upload file",           HttpStatus.INTERNAL_SERVER_ERROR),
-    EMAIL_SEND_FAILED    (500, "Failed to send email",            HttpStatus.INTERNAL_SERVER_ERROR);
+    EMAIL_SEND_FAILED    (500, "Failed to send email",            HttpStatus.INTERNAL_SERVER_ERROR),
+    PASSWORD_INCORRECT  (400, "Current password is incorrect", HttpStatus.BAD_REQUEST),
+    PASSWORD_NOT_MATCH  (400, "Passwords do not match",        HttpStatus.BAD_REQUEST),
+    OTP_INVALID      (400, "OTP is invalid or expired", HttpStatus.BAD_REQUEST),
+    EMAIL_NOT_FOUND  (404, "Email not found",            HttpStatus.NOT_FOUND),
+
+    ;
 
     private final int        code;
     private final String     message;

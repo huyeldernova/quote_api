@@ -1,6 +1,8 @@
 package com.example.api.repository;
 
 import com.example.api.entity.EmailLog;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,4 +30,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
 
     @Query("SELECT e FROM EmailLog e WHERE e.quote.user.id = :userId ORDER BY e.sentAt DESC LIMIT 5")
     List<EmailLog> findTop5ByUserId(@Param("userId") String userId);
+
+    @Query("SELECT e FROM EmailLog e WHERE e.quote.user.id = :userId ORDER BY e.sentAt DESC")
+    Page<EmailLog> findByUserId(@Param("userId") String userId, Pageable pageable);
 }

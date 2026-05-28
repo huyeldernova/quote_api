@@ -75,11 +75,31 @@ public class QuoteController {
         return ResponseEntity.ok(quoteService.sendEmail(id, req));
     }
 
-    /** GET /api/v1/quotes/search?keyword=vietnam&status=DRAFT */
+    /** GET /api/v1/quotes?page=0&size=10 */
+    @GetMapping
+    public ResponseEntity<PageResponse<QuoteListItemResponse>> getAll(
+            @RequestParam(defaultValue = "0")  int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(quoteService.getAllQuotes(page, size));
+    }
+
+    /** GET /api/v1/quotes/search?keyword=vietnam&status=DRAFT&page=0&size=10 */
     @GetMapping("/search")
-    public ResponseEntity<List<QuoteListItemResponse>> search(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) QuoteStatus status) {
-        return ResponseEntity.ok(quoteService.searchQuotes(keyword, status));
+    public ResponseEntity<PageResponse<QuoteListItemResponse>> search(
+            @RequestParam(required = false)    String keyword,
+            @RequestParam(required = false)    QuoteStatus status,
+            @RequestParam(defaultValue = "0")  int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(quoteService.searchQuotes(keyword, status, page, size));
+    }
+
+    /** GET /api/v1/quotes/{id}/preview — xem PDF inline trên browser */
+    @GetMapping("/{id}/preview")
+    public ResponseEntity<byte[]> previewPdf(@PathVariable Long id) {
+        byte[] pdf = quoteService.generatePdf(id);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"quote.pdf\"")
+                .body(pdf);
     }
 }
