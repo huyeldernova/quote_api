@@ -67,4 +67,54 @@ public class EmailService {
             throw new AppException(ErrorCode.EMAIL_SEND_FAILED);
         }
     }
+
+    void sendWelcomeEmail(String email, String name) {
+        try {
+            MimeMessage mime = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mime, true, "UTF-8");
+            helper.setFrom(fromEmail, "Tourist Leader");
+            helper.setTo(email);
+            helper.setSubject("Welcome to Tourist Leader - QuoteSend");
+            helper.setText("""
+                <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+                    <div style="background:#0F2050;padding:30px;text-align:center;">
+                        <h1 style="color:white;margin:0;">TOURIST LEADER</h1>
+                        <div style="color:#C9A84C;font-size:13px;margin-top:5px;">EXPLORE THE WORLD</div>
+                    </div>
+                    <div style="padding:40px;background:#fff;">
+                        <h2 style="color:#0F2050;">Welcome, %s! 👋</h2>
+                        <p style="color:#444;line-height:1.6;">
+                            Your QuoteSend account has been created successfully.
+                            You can now start creating professional travel quotations for your clients.
+                        </p>
+                        <div style="background:#EEF3FB;border-left:4px solid #1E3A6E;
+                                    padding:15px 20px;margin:25px 0;">
+                            <p style="margin:0;color:#1E3A6E;font-weight:bold;">
+                                🚀 Get started in 3 steps:
+                            </p>
+                            <ol style="color:#444;margin:10px 0 0 0;padding-left:20px;">
+                                <li>Create your first quote</li>
+                                <li>Add tour details and costs</li>
+                                <li>Send it to your client with one click</li>
+                            </ol>
+                        </div>
+                        <a href="https://thedigitaldyno.in"
+                           style="display:inline-block;background:#0F2050;color:white;
+                                  padding:12px 30px;border-radius:6px;text-decoration:none;
+                                  font-weight:bold;margin-top:10px;">
+                            Go to QuoteSend →
+                        </a>
+                    </div>
+                    <div style="background:#0F2050;padding:15px;text-align:center;
+                                color:rgba(255,255,255,0.6);font-size:11px;">
+                        help@touristleader.com | www.touristleader.com
+                    </div>
+                </div>
+                """.formatted(name), true);
+            mailSender.send(mime);
+            log.info("Welcome email sent to {}", email);
+        } catch (Exception e) {
+            log.warn("Failed to send welcome email to {}: {}", email, e.getMessage());
+        }
+    }
 }

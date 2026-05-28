@@ -42,6 +42,7 @@ public class AuthenticationService {
     private final SecurityUtils         securityUtils;
     private final OtpTokenRepository otpTokenRepository;
     private final JavaMailSender mailSender;
+    private final EmailService emailService;
     @Value("${spring.mail.username}")
     private String fromEmail;
 
@@ -69,6 +70,7 @@ public class AuthenticationService {
                 .build();
         user.addRole(role);
         userRepository.save(user);
+        emailService.sendWelcomeEmail(user.getEmail(), user.getName());
         return buildLoginResponse(user);
     }
 
